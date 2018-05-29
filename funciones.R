@@ -59,6 +59,7 @@ maxTriage<-as.double(args[18])
 stepTriage<-as.double(args[19])
 followUp<-args[20]
 timeFollowUp<-as.double(args[21])
+nomArch<-args[22]
 
 #-----Leer datos---------------------------------------------------------------------------
   nacimientos = as.matrix(read.xlsx("ParametrosGenerales.xlsx",2, dec =",", as.data.frame = TRUE))
@@ -674,7 +675,6 @@ timeFollowUp<-as.double(args[21])
  # data(vacRangeFemaleIni,vacRangeFemaleEnd,vacRangeMaleIni,vacRangeMaleEnd, vacYearsFemaleIni,vacYearsFemaleEnd, vacYearsMaleIni,vacYearsMaleEnd, vacSex, vacPorcentageFemale, vacPorcentageMale, primaryTest, iniPrimaryTest, maxPrimaryTest, stepPrimaryTest, triageTest, iniTriage, maxTriage, stepTriage,followUp, timeFollowUp)
  #dat<- data(15,30,15,30,5,10,5,10,c("Hombres","Mujeres"),0.15,0.15,"HPV-DNA", 25,65,5,"Citology",25,65,5,"Citology",6)
  dat<- data(vacRangeFemaleIni,vacRangeFemaleEnd,vacRangeMaleIni,vacRangeMaleEnd, vacYearsFemaleIni,vacYearsFemaleEnd, vacYearsMaleIni,vacYearsMaleEnd, vacSex, vacPorcentageFemale, vacPorcentageMale, primaryTest, iniPrimaryTest, maxPrimaryTest, stepPrimaryTest, triageTest, iniTriage, maxTriage, stepTriage,followUp, timeFollowUp)
- write.table(dat, file="dat.csv")
  
   #----------------------------GrÃ¡ficas-----------------------------------------------------
   
@@ -910,9 +910,9 @@ timeFollowUp<-as.double(args[21])
       }
       
       if(sexoIndice == 3){
-        ap <- setNames(data.frame(matrix(ncol = 4, nrow = 0)), c("Year","Value", "Biological Comp.","Gender"))
+        ap <- setNames(data.frame(matrix(ncol = 4, nrow = 0)), c("Year","Value", "Biological_Comp","Gender"))
       }else{
-        ap <- setNames(data.frame(matrix(ncol = 3, nrow = 0)), c("Year","Value", "Biological Comp."))
+        ap <- setNames(data.frame(matrix(ncol = 3, nrow = 0)), c("Year","Value", "Biological_Comp"))
       }
       
       #Leer el input de biologicalCompUsuario
@@ -1041,4 +1041,16 @@ timeFollowUp<-as.double(args[21])
   }
   
   tabla=buildTable(c("Mujeres","Hombres"), bioloGeneral[,1],c(5,35),30)
+  write.csv(tabla, file=nomArch, sep=",")
+  num<-30
+  texto = paste("The total vaccination cost is: ", round(sum(dat[1:num, edades*(compart+2)+1])))
+  texto2 = paste("The total Primary Test cost is: ", round(sum(dat[1:num, edades*(compart+2)+2])))
+  texto3 = paste0("The total Triage is: ", round(sum(dat[1:num, edades*(compart+2)+3])))
+  texto4 = paste0("The total Follow Up cost is: ", round(sum(dat[1:num, edades*(compart+2)+4])))
+  valor = round(sum(dat[1:num, edades*(compart+2)+1])) + round(sum(dat[1:num, edades*(compart+2)+2])) + round(sum(dat[1:num, edades*(compart+2)+3])) +round(sum(dat[1:num, edades*(compart+2)+4]))
+  texto5 = paste0("The total cost is: ", valor)
+  texto6 = paste0("The total effectiveness is: ", round(sum(dat[1:num, edades*(compart+2)+5])))
+  
+cFinal<-paste(texto, texto2,texto3,texto4,texto5,texto6,sep = '<br/>')
+print(cFinal)
   

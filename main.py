@@ -1,13 +1,21 @@
-from flask import Flask, render_template, flash, request, jsonify, send_from_directory
+from flask import Flask, render_template, flash, request, jsonify, send_from_directory, redirect, url_for
 import subprocess
 import sys
 import os
+import time
+from multiprocessing import Process
 
 app = Flask(__name__, static_url_path='')
-app.run(debug=True)
+app.debug=True
 
 projects = {}
 currentProject = {}
+array = []
+
+def workerFunction():
+    while True:
+        time.sleep(10)
+        print ("splip pasa")
 
 @app.route('/js/<path:path>')
 def send_js(path):
@@ -21,7 +29,11 @@ def send_images(path):
 def send_css(path):
     return send_from_directory('templates/css', path)
 
-@app.route('/')
+@app.route('/generated/<path:path>')
+def send_generated(path):
+    return send_from_directory('generated', path)
+
+@app.route("/")
 def hello_world():
     return render_template('pages/index.html')
 
@@ -35,7 +47,7 @@ def screening():
 
 @app.route('/results')
 def results():
-    return render_template('pages/results.html')
+    return render_template('pages/chart.html')
 
 @app.route('/api/projects', methods=['GET', 'POST'])
 def form_example():
@@ -77,18 +89,7 @@ def vaccinationPost():
         vaccination['malAgeRange'] = request.form.get('malAgeRange')
         vaccination['malYears'] = request.form.get('malYears')
         vaccination['malPercentage'] = request.form.get('malPercentage')
-
-        if request.form.get('malCheck') is None:
-            vaccination['malAgeRange'] = 'NA'
-            vaccination['malYears'] = 'NA'
-            vaccination['malPercentage'] = 'NA'
-
-        if request.form.get('femCheck') is None:
-            vaccination['femAgeRange'] = 'NA'
-            vaccination['femYears'] = 'NA'
-            vaccination['femPercentage'] = 'NA'
         currentProject['vaccination'] = vaccination
-        print (currentProject)
 
     return render_template('pages/screening.html')
 
@@ -112,17 +113,56 @@ def screeningPost():
         screening['timeFollTest'] = request.form.get('timeFollTest')
 
         currentProject['screening'] = screening
-        print (currentProject)
-        return jsonify(results = currentProject)
+
+        print ("Proyecto actual")
+        print ( currentProject )
+
+        vacRangeFemaleIni = currentProject['vaccination']['femAgeRange'].split(";")[0]
+        vacRangeFemaleEnd = currentProject['vaccination']['femAgeRange'].split(";")[1]
+        vacYearsFemaleIni = currentProject['vaccination']['femYears'].split(";")[0]
+        vacYearsFemaleEnd = currentProject['vaccination']['femYears'].split(";")[1]
+        vacPercentageFemale = currentProject['vaccination']['femPercentage']
+
+        vacRangeMaleIni = currentProject['vaccination']['malAgeRange'].split(";")[0]
+        vacRangeMaleEnd = currentProject['vaccination']['malAgeRange'].split(";")[1]
+        vacYearsMaleIni = currentProject['vaccination']['malYears'].split(";")[0]
+        vacYearsMaleEnd = currentProject['vaccination']['malYears'].split(";")[1]
+        vacPercentageMale = currentProject['vaccination']['malPercentage']
+
+        vacSex = "2"
+
+        primaryTest = screening['selPrimTest']
+        iniPrimaryTest = screening['agePrimTest'].split(";")[0]
+        maxPrimaryTest = screening['agePrimTest'].split(";")[1]
+        stepPrimaryTest = screening['freqPrimTest']
+
+        triageTest = screening['selTriageTest']
+        iniTriage = screening['ageTriageTest'].split(";")[0]
+        maxTriage = screening['ageTriageTest'].split(";")[1]
+        stepTriage = screening['freqTriageTest']
+
+        followUp = screening['selFollTest']
+        timeFollowUp = screening['timeFollTest']
+
+        fileName = "generated/"+currentProject['name']+".csv"
+
+        commands = ["Rscript", "funciones.R", vacRangeFemaleIni, vacRangeFemaleEnd, vacRangeMaleIni, vacRangeMaleEnd, vacYearsFemaleIni, vacYearsFemaleEnd, vacYearsMaleIni, vacYearsMaleEnd, vacSex, vacPercentageFemale, vacPercentageMale, primaryTest, iniPrimaryTest, maxPrimaryTest, stepPrimaryTest, triageTest, iniTriage, maxTriage, stepTriage, followUp, timeFollowUp, fileName]
+        print (commands)
+        #runCommand(commands)
+        return redirect(url_for('results', fileName=currentProject['name']+".csv"))
 
 def createProject(p):
+    print (array)
     currentProject['name'] = p
     path = p
-    if not os.path.exists(path):
-        os.makedirs(path)
-        runCommand(["ls"])
 
 def runCommand (command):
-    result= subprocess.run(command, stdout=subprocess.PIPE, universal_newlines=True)
+    result= subprocess.Popen(command, stdout=subprocess.PIPE, universal_newlines=True)
     print(result.stdout)
     return result.stdout
+#if __name__ == '__main__':    
+    #worker = Process(target=workerFunction)
+    #worker.start()
+app.run(debug=True)
+
+

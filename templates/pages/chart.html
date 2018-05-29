@@ -12,19 +12,19 @@
     <title>SB Admin 2 - Bootstrap Admin Theme</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- MetisMenu CSS -->
-    <link href="../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+    <link href="css/metisMenu.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+    <link href="css/sb-admin-2.css" rel="stylesheet">
 
     <!-- Morris Charts CSS -->
-    <link href="../vendor/morrisjs/morris.css" rel="stylesheet">
+    <link href="js/morris.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
-    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -426,21 +426,21 @@
 
 
     <!-- jQuery -->
-    <script src="../vendor/jquery/jquery.min.js"></script>
+    <script src="js/jquery.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="../vendor/metisMenu/metisMenu.min.js"></script>
+    <script src="js/metisMenu.min.js"></script>
 
     <!-- Flot Charts JavaScript -->
-    <script src="../dist/js/Chart.js"></script>
-    <script src="../js/util.js"></script>
+    <script src="js/Chart.js"></script>
+    <script src="js/util.js"></script>
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
-    <script src="../js/jquery.csv.min.js"></script>
+    <script src="js/sb-admin-2.js"></script>
+    <script src="js/jquery.csv.min.js"></script>
 
     <script>
 
@@ -514,11 +514,53 @@
 				}
 			}
 		};
+
+        function findGetParameter(parameterName) {
+    var result = null,
+        tmp = [];
+    location.search
+        .substr(1)
+        .split("&")
+        .forEach(function (item) {
+          tmp = item.split("=");
+          if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+        });
+    return result;
+}
+
+var route;
+
 		window.onload = function() {
 
-                        $.ajax({
+            route = "http://localhost:5000/generated/"+findGetParameter("fileName");
+            //route = "https://dcsolano10.github.io/datasetCancer/resultados.csv";
+            console.log(route);
+            requestGraphs();
+			//var ctx = document.getElementById('graficaCancer1').getContext('2d');
+            //window.myLine = new Chart(ctx, dataGraph);
+            
+
+
+        };
+
+        function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function demo() {
+  console.log('Taking a break...');
+  await sleep(10000);
+      requestGraphs();
+  console.log('Two second later');
+}
+
+
+
+        function requestGraphs ()
+        {
+                                    $.ajax({
   type: 'GET',
-  url: 'https://dcsolano10.github.io/datasetCancer/resultados.csv',
+  url: route,
   success: function(resp) {
     var objects = $.csv.toObjects(resp);
     console.log(objects[0]);
@@ -527,20 +569,20 @@
     var finalLabels = [];
     var finalDatasets = [];
 
-    	var COLORS = [
-		'#4dc9f6',
-		'#f67019',
-		'#f53794',
-		'#537bc4',
-		'#acc236',
-		'#166a8f',
-		'#00a950',
-		'#58595b',
+        var COLORS = [
+        '#4dc9f6',
+        '#f67019',
+        '#f53794',
+        '#537bc4',
+        '#acc236',
+        '#166a8f',
+        '#00a950',
+        '#58595b',
         '#8549ba',
         '#f2189e',
         '#17f122',
         '#edc687'
-	];
+    ];
     var colorIndex = 0;
     for (let i = 0; i < objects.length; i++) {
         var row = objects[i];
@@ -573,16 +615,12 @@
       
   },
   error: function() {
+    demo();
+    console.log('requested');
 
   }
 });
-
-			//var ctx = document.getElementById('graficaCancer1').getContext('2d');
-            //window.myLine = new Chart(ctx, dataGraph);
-            
-
-
-        };
+        }
         
         
 
