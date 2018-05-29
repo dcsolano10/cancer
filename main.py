@@ -35,6 +35,7 @@ def send_generated(path):
 
 @app.route("/")
 def hello_world():
+    currentProject = {}
     return render_template('pages/index.html')
 
 @app.route('/vaccination')
