@@ -33,6 +33,22 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    <style type="text/css">
+        .loader {
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+    </style>
+
 </head>
 
 <body>
@@ -386,7 +402,11 @@
                             	<div style="width:90%;">
                                         <canvas id="graficaCancer1"></canvas>
                                     </div>
-
+                                    <div id="loader">
+                                    <div class="loader">
+                                    </div>
+                                    <h3> Model is beign processed </h3>
+                                    </div>
                         </div>
                         <!-- /.panel-body -->
                     </div>
@@ -402,6 +422,11 @@
                         <div class="panel-body">
                                 <div style="width:90%;">
                                         <canvas id="graficaCostos"></canvas>
+                                    </div>
+                                     <div id="loader2">
+                                    <div class="loader">
+                                    </div>
+                                    <h3> Model is beign processed </h3>
                                     </div>
 
                         </div>
@@ -534,8 +559,8 @@ var route;
 
             route = "http://localhost:5000/generated/"+findGetParameter("fileName");
             //route = "https://dcsolano10.github.io/datasetCancer/resultados.csv";
-            console.log(route);
             requestGraphs();
+            requestBarGraph();
 			//var ctx = document.getElementById('graficaCancer1').getContext('2d');
             //window.myLine = new Chart(ctx, dataGraph);
             
@@ -551,7 +576,65 @@ async function demo() {
   console.log('Taking a break...');
   await sleep(10000);
       requestGraphs();
+      requestBarGraph();
   console.log('Two second later');
+}
+
+function requestBarGraph()
+{
+    route2 = "http://localhost:5000/generated/bar_"+findGetParameter("fileName");
+       $.ajax({
+  type: 'GET',
+  url: route2,
+  success: function(resp) {
+    var objects = $.csv.toObjects(resp);
+    console.log(objects[0]);
+
+    var newData = {
+        labels: ["Total cost","Total vaccination cost", "Total Primary Test cost", "Total triage cost", "Total Follow Up cost"],
+        datasets: [{
+            label: 'Cost in thousands of millions of pesos',
+            data: [objects[0].x, objects[1].x, objects[2].x, objects[3].x, objects[4].x],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    }
+    document.getElementById('loader2').style.display = "none";
+    var ctx = document.getElementById("graficaCostos").getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: newData,
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+      
+  },
+  error: function() {
+    console.log("erroru")
+  }
+});
 }
 
 
@@ -610,6 +693,7 @@ async function demo() {
     var finalData = {type: 'line', data:{labels:finalLabels, datasets:finalDatasets} };
 
     console.log(finalData);
+    document.getElementById('loader').style.display = "none";
     var ctx = document.getElementById('graficaCancer1').getContext('2d');
             window.myLine = new Chart(ctx, finalData);
       
@@ -630,43 +714,7 @@ async function demo() {
 	</script>
     <canvas id="myChart" width="400" height="400"></canvas>
 <script>
-var ctx = document.getElementById("graficaCostos").getContext('2d');
-var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ["Total cost","Total vaccination cost", "Total Primary Test cost", "Total triage cost", "Total Follow Up cost"],
-        datasets: [{
-            label: 'Cost in thousands of millions of pesos',
-            data: [25138.1, 5751.0, 5053.1, 8421.8, 5912.1],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
-        }
-    }
-});
+
 </script>
 
 </body>

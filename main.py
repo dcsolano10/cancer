@@ -145,10 +145,11 @@ def screeningPost():
         timeFollowUp = screening['timeFollTest']
 
         fileName = "generated/"+currentProject['name']+".csv"
+        fileName2 = "generated/bar_"+currentProject['name']+".csv"
 
-        commands = ["Rscript", "funciones.R", vacRangeFemaleIni, vacRangeFemaleEnd, vacRangeMaleIni, vacRangeMaleEnd, vacYearsFemaleIni, vacYearsFemaleEnd, vacYearsMaleIni, vacYearsMaleEnd, vacSex, vacPercentageFemale, vacPercentageMale, primaryTest, iniPrimaryTest, maxPrimaryTest, stepPrimaryTest, triageTest, iniTriage, maxTriage, stepTriage, followUp, timeFollowUp, fileName]
+        commands = ["Rscript", "funciones.R", vacRangeFemaleIni, vacRangeFemaleEnd, vacRangeMaleIni, vacRangeMaleEnd, vacYearsFemaleIni, vacYearsFemaleEnd, vacYearsMaleIni, vacYearsMaleEnd, vacSex, vacPercentageFemale, vacPercentageMale, primaryTest, iniPrimaryTest, maxPrimaryTest, stepPrimaryTest, triageTest, iniTriage, maxTriage, stepTriage, followUp, timeFollowUp, fileName, fileName2]
         print (commands)
-        #runCommand(commands)
+        runCommand(commands)
         return redirect(url_for('results', fileName=currentProject['name']+".csv"))
 
 def createProject(p):

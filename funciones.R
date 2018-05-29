@@ -47,8 +47,8 @@ if(args[9]==1){
 }else{
   vacSex<-c("Hombres","Mujeres")
 }
-vacPorcentageFemale<-as.double(args[10])
-vacPorcentageMale<-as.double(args[11])
+vacPorcentageFemale<-as.double(args[10])/100
+vacPorcentageMale<-as.double(args[11])/100
 primaryTest<- args[12]
 iniPrimaryTest<-as.double(args[13])
 maxPrimaryTest<-as.double(args[14]) 
@@ -60,7 +60,7 @@ stepTriage<-as.double(args[19])
 followUp<-args[20]
 timeFollowUp<-as.double(args[21])
 nomArch<-args[22]
-
+nomArch2<-args[23]
 #-----Leer datos---------------------------------------------------------------------------
   nacimientos = as.matrix(read.xlsx("ParametrosGenerales.xlsx",2, dec =",", as.data.frame = TRUE))
   parametros = as.matrix(read.xlsx("ParametrosGenerales.xlsx",1, dec =",", as.data.frame = TRUE))
@@ -1041,16 +1041,14 @@ nomArch<-args[22]
   }
   
   tabla=buildTable(c("Mujeres","Hombres"), bioloGeneral[,1],c(5,35),30)
-  write.csv(tabla, file=nomArch, sep=",")
+  write.csv(tabla, file=nomArch)
   num<-30
-  texto = paste("The total vaccination cost is: ", round(sum(dat[1:num, edades*(compart+2)+1])))
-  texto2 = paste("The total Primary Test cost is: ", round(sum(dat[1:num, edades*(compart+2)+2])))
-  texto3 = paste0("The total Triage is: ", round(sum(dat[1:num, edades*(compart+2)+3])))
-  texto4 = paste0("The total Follow Up cost is: ", round(sum(dat[1:num, edades*(compart+2)+4])))
-  valor = round(sum(dat[1:num, edades*(compart+2)+1])) + round(sum(dat[1:num, edades*(compart+2)+2])) + round(sum(dat[1:num, edades*(compart+2)+3])) +round(sum(dat[1:num, edades*(compart+2)+4]))
-  texto5 = paste0("The total cost is: ", valor)
-  texto6 = paste0("The total effectiveness is: ", round(sum(dat[1:num, edades*(compart+2)+5])))
-  
-cFinal<-paste(texto, texto2,texto3,texto4,texto5,texto6,sep = '<br/>')
-print(cFinal)
+  tvc = round(sum(dat[1:num, edades*(compart+2)+1]))/1000000000
+  tpt = round(sum(dat[1:num, edades*(compart+2)+2]))/1000000000
+  ttt = round(sum(dat[1:num, edades*(compart+2)+3]))/1000000000
+  tfu = round(sum(dat[1:num, edades*(compart+2)+4]))/1000000000
+  tc = (round(sum(dat[1:num, edades*(compart+2)+1])) + round(sum(dat[1:num, edades*(compart+2)+2])) + round(sum(dat[1:num, edades*(compart+2)+3])) +round(sum(dat[1:num, edades*(compart+2)+4])))/1000000000
+  costosFM<-c(tc,tvc,tpt,ttt,tfu)
+  write.csv(costosFM, file=nomArch2)
+  print(costosFM)
   
